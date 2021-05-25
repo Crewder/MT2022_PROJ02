@@ -1,0 +1,42 @@
+version: "3.7"
+
+services:
+  webserver:
+    build:
+      context: ./docker/apache
+    container_name: 'webserver'
+    ports:
+      - "8080:80"
+    links:
+      - mysql
+    volumes:
+      - ./www:/var/www/html
+  mysql:
+    build: ./docker/mysql
+    container_name: 'mysql'
+    ports:
+      - "1998:3306"
+    volumes:
+      - ./data/mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: 'phpmyadmin'
+    links:
+      - mysql
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    ports:
+      - '9999:80'
+    volumes:
+      - /sessions
+  rabbitmq:
+    image: rabbitmq:3.8-management
+    container_name: 'rabbitmq'
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+      RABBITMQ_DEFAULT_VHOST: rabbitmq-host
