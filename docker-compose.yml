@@ -11,7 +11,6 @@ services:
       - mysql
     volumes:
       - ./www:/var/www/html
-      - ./config/vhosts:/etc/apache2/sites-enabled
   mysql:
     build: ./docker/mysql
     container_name: 'mysql'
