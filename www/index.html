@@ -8,7 +8,9 @@
     <title>Document</title>
 </head>
 <body>
-hello :)
-<?php var_dump("hello"); ?>
+    <form action="upload.php" method="POST" enctype="multipart/form-data">
+        <input type="file" name="picture" id="picture">
+        <input type="submit" value="Enregistrer image">
+    </form>
 </body>
 </html>
