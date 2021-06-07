@@ -9,8 +9,12 @@
 </head>
 <body>
 <?php
-$user = new UserModel();
 
+require_once 'vendor/autoload.php';
+
+use App\Model\User\UserModel;
+
+$user = new UserModel();
 var_dump($user->getAvatar(2));
 $user->setAvatar(2, 2);
 var_dump($user->getAvatar(2));
