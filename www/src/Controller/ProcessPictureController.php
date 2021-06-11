@@ -10,7 +10,7 @@ class ProcessPictureController
     {
     }
 
-    public function __invoke()
+    public static function processPicture($picture)
     {
         $FOLDER = 'upload/';
         $size = getimagesize($FOLDER . $picture['name']);

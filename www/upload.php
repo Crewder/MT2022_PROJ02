@@ -15,7 +15,7 @@ include 'processPicture.php';
             echo 'Upload effectué avec succès !';
             try {
                 processPicture($_FILES['picture']);
-                ProcessPictureController::class;
+                //ProcessPictureController::processPicture($_FILES['picture']);
             } catch (Exception $e) {
             }
         }
