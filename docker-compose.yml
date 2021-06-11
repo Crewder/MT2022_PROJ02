@@ -12,6 +12,7 @@ services:
     volumes:
       - ./www:/var/www/html
   mysql:
+    platform: linux/x86_64
     build: ./docker/mysql
     container_name: 'mysql'
     ports:

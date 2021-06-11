@@ -8,17 +8,6 @@
     <title>Document</title>
 </head>
 <body>
-<?php
-
-require_once 'vendor/autoload.php';
-
-use App\Model\User\UserModel;
-
-$user = new UserModel();
-var_dump($user->getAvatar(2));
-$user->setAvatar(2, 2);
-var_dump($user->getAvatar(2));
-?>
     <form action="upload.php" method="POST" enctype="multipart/form-data">
         <input type="file" name="picture" id="picture">
         <input type="submit" value="Enregistrer image">
