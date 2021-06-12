@@ -11,5 +11,7 @@
       "App\\": "src/"
     }
   },
-    "require": {}
+    "require": {
+        "php-amqplib/php-amqplib": "^3.0"
+    }
 }
