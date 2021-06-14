@@ -1,18 +1,19 @@
 <?php
 
 namespace App\Controller;
-require_once __DIR__ . '../../vendor/autoload.php';
 
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage;
 
 class RabbitMQHandler
 {
-    private AMQPChannel $AMQPChannel;
 
-    public function __construct(RabbitMqConfig $mqconfig)
+
+    private AMQPChannel $_AMQPChannel;
+
+    public function __construct(RabbitMqConfig $config)
     {
-        $this->AMQPChannel = $mqconfig->Connection();
+        $this->_AMQPChannel = $config->GetChannel();
     }
 
     public function SendMessage($message): void
@@ -23,10 +24,13 @@ class RabbitMQHandler
 
         $FormattedMessage = new AMQPMessage(
             $message,
-            array('delivery_mode' => AMQPMessage::DELIVERY_MODE_PERSISTENT)
         );
 
-        $this->AMQPChannel->basic_publish($FormattedMessage, '', 'hello');
+
+        $msg = new AMQPMessage('Hello World!');
+        $this->_AMQPChannel->basic_publish($msg, '', 'avatar');
+
+      //  $this->_AMQPChannel->basic_publish($FormattedMessage);
     }
 
     public function ListenQueue($queueName): void
@@ -38,8 +42,8 @@ class RabbitMQHandler
             $msg->ack();
         };
 
-        $this->AMQPChannel->basic_qos(null, 1, null);
-        $this->AMQPChannel->basic_consume($queueName, false, true, false, false, $callback);
+       // $this->_AMQPChannel->basic_qos(null, 1, null);
+        $this->_AMQPChannel->basic_consume($queueName, 'avatar', false, true, false, $callback);
     }
 
 
