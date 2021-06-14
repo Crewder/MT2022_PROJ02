@@ -7,10 +7,12 @@ services:
     container_name: 'webserver'
     ports:
       - "8080:80"
+    user: ${UID}
     links:
       - mysql
     volumes:
       - ./www:/var/www/html
+      - ./config/envvars:/etc/apache2/envvars
   mysql:
     build: ./docker/mysql
     container_name: 'mysql'
