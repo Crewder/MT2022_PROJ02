@@ -16,35 +16,51 @@ use App\Controller\RabbitMqConfig;
 use App\Controller\RabbitMQHandler;
 use App\Model\User\UserModel;
 
+
 $user = new UserModel();
 var_dump($user->getAvatar(2));
 $user->setAvatar(2, 2);
 var_dump($user->getAvatar(2));
 
+// env
 $host = "172.18.0.1";
 $port = 5672;
 $user = "guest";
 $password = "guest";
+
+// Variable neccesaire au  RabbitMQConfig
 $queueName = "Image-Resizer";
 $message = "hello-world2";
-$vhost= "rabbitmq-host";
+$exchange = "direct_resize";
+$routing_key = "Resize_route";
+$vhost = "rabbitmq-host";
 
-$config = new RabbitMqConfig($host,$port,$user,$password,$queueName,$vhost);
+// Connection au server et creation des elements necessaire a  l'utilisation des queues
+$config = new RabbitMqConfig($host, $port, $user, $password, $queueName, $vhost, $exchange, $routing_key);
 $config->Connection();
-$config->CreatingQueue();
+$config->CreateQueue();
+$config->CreateExchange("direct");
 
+// Private variable dans l'objet $config
+$Queue = $config->GetQueueName();
+$Exchange = $config->GetExchange();
+
+//relie l'exchange a la queue
+$config->BindExchangeToQueue($Queue, $Exchange);
+
+// handler pour la gestion des message  / Listen / Send
 $handler = new RabbitMQHandler($config);
 $handler->SendMessage($message);
-//var_dump($config->GetQueueName()));
+$handler->ListenQueue($Queue);
 
-//$handler->ListenQueue($Queue);
-
+// Fermeture de la connection
+$config->CloseChannel();
 
 
 ?>
-    <form action="upload.php" method="POST" enctype="multipart/form-data">
-        <input type="file" name="picture" id="picture">
-        <input type="submit" value="Enregistrer image">
-    </form>
+<form action="upload.php" method="POST" enctype="multipart/form-data">
+    <input type="file" name="picture" id="picture">
+    <input type="submit" value="Enregistrer image">
+</form>
 </body>
 </html>
