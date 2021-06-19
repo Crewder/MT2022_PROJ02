@@ -12,31 +12,33 @@
 
 require_once 'vendor/autoload.php';
 
+use App\Controller\ProcessPictureController;
 use App\Controller\RabbitMqConfig;
 use App\Controller\RabbitMQHandler;
-use App\Model\User\UserModel;
 
-
-$user = new UserModel();
-var_dump($user->getAvatar(2));
-$user->setAvatar(2, 2);
-var_dump($user->getAvatar(2));
-
-// env
-$host = "172.18.0.1";
+$host = "rabbitmq";
 $port = 5672;
 $user = "guest";
 $password = "guest";
-
-// Variable neccesaire au  RabbitMQConfig
-$queueName = "Image-Resizer";
-$message = "hello-world2";
-$exchange = "direct_resize";
-$routing_key = "Resize_route";
 $vhost = "rabbitmq-host";
 
+//configuration des queues
+$queuename = "Image-Resizer";
+$exchange = "direct_resize";
+$routingkey = "Resize_route";
+
 // Connection au server et creation des elements necessaire a  l'utilisation des queues
-$config = new RabbitMqConfig($host, $port, $user, $password, $queueName, $vhost, $exchange, $routing_key);
+$config = new RabbitMqConfig(
+                            $host,
+                            $port,
+                            $user,
+                            $password,
+                            $queuename,
+                            $vhost,
+                            $exchange,
+                            $routingkey
+                           );
+
 $config->Connection();
 $config->CreateQueue();
 $config->CreateExchange("direct");
@@ -48,19 +50,30 @@ $Exchange = $config->GetExchange();
 //relie l'exchange a la queue
 $config->BindExchangeToQueue($Queue, $Exchange);
 
-// handler pour la gestion des message  / Listen / Send
-$handler = new RabbitMQHandler($config);
-$handler->SendMessage($message);
-$handler->ListenQueue($Queue);
+//handler pour la gestion des message  / Listen / Send
+//$handler = new RabbitMQHandler($config);
+//$handler->ListenQueue($Queue);
 
+
+// todo unactive timer
 // Fermeture de la connection
-$config->CloseChannel();
+//$config->CloseChannel();
 
+if ($_FILES['picture']) {
+  $controller = new ProcessPictureController($config);
+  $controller->uploadPicture();
+    ?>
 
+    <a type="button" href="/"> Retour </a>
+    <?php
+}else {
 ?>
-<form action="upload.php" method="POST" enctype="multipart/form-data">
+<form action="index.php" method="POST" enctype="multipart/form-data">
     <input type="file" name="picture" id="picture">
     <input type="submit" value="Enregistrer image">
 </form>
 </body>
 </html>
+
+<?php
+}

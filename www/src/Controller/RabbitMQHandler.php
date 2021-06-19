@@ -7,15 +7,17 @@ use PhpAmqpLib\Message\AMQPMessage;
 
 class RabbitMQHandler
 {
-    private AMQPChannel $_AMQPChannel;
-    private string $_exchange;
-    private string $_routing_key;
+    private AMQPChannel $amqpChannel;
+    private string $exchange;
+    private string $routing_key;
+    private RabbitMqConfig $config;
 
     public function __construct(RabbitMqConfig $config)
     {
-        $this->_AMQPChannel = $config->GetChannel();
-        $this->_exchange = $config->GetExchange();
-        $this->_routing_key = $config->GetRoutingKey();
+        $this->amqpChannel = $config->GetChannel();
+        $this->exchange = $config->GetExchange();
+        $this->routing_key = $config->GetRoutingKey();
+        $this->config = $config;
     }
 
     /**
@@ -34,7 +36,7 @@ class RabbitMQHandler
             $message,
         );
 
-        $this->_AMQPChannel->basic_publish($FormattedMessage, $this->_exchange, $this->_routing_key);
+        $this->amqpChannel->basic_publish($FormattedMessage, $this->exchange, $this->routing_key);
     }
 
     /**
@@ -43,13 +45,15 @@ class RabbitMQHandler
      * @param $queueName
      * @return void
      */
-    public function ListenQueue($queueName) : void
+    public function ListenQueue($queueName): void
     {
         $callback = function ($msg) {
-            $msg->ack();
+            $controller = new ProcessPictureController($this->config);
+            $controller->processPicture($msg->body);
         };
 
-        $this->_AMQPChannel->basic_qos(null, 1, null);
-        $this->_AMQPChannel->basic_consume($queueName, 'avatar', false, true, false, $callback);
+        $this->amqpChannel->basic_qos(null, 1, null);
+        $this->amqpChannel->basic_consume($queueName, 'avatar', false, true, false, $callback);
     }
+
 }

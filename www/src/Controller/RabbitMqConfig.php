@@ -7,27 +7,36 @@ use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 class RabbitMqConfig
 {
-    private string $_host;
-    private int $_port;
-    private string $_user;
-    private string $_password;
-    private string $_queueName;
-    private string $_vhost;
-    private AMQPChannel $_AMQPChannel;
-    private string $_exchange;
-    private string $_routing_key;
+    private string $host;
+    private int $port;
+    private string $user;
+    private string $password;
+    private string $queueName;
+    private string $vhost;
+    private AMQPChannel $amqpChannel;
+    private string $exchange;
+    private string $routing_key;
 
 
-    public function __construct(string $_host, int $_port, string $_user, string $_password, string $_queueName, string $_vhost, string $_exchange, string $_routing_key)
+    public function __construct(
+                                string $host,
+                                int $port,
+                                string $user,
+                                string $password,
+                                string $queueName,
+                                string $vhost,
+                                string $exchange,
+                                string $routing_key
+                               )
     {
-        $this->_host = $_host;
-        $this->_port = $_port;
-        $this->_user = $_user;
-        $this->_password = $_password;
-        $this->_queueName = $_queueName;
-        $this->_vhost = $_vhost;
-        $this->_exchange = $_exchange;
-        $this->_routing_key = $_routing_key;
+        $this->host = $host;
+        $this->port = $port;
+        $this->user = $user;
+        $this->password = $password;
+        $this->queueName = $queueName;
+        $this->vhost = $vhost;
+        $this->exchange = $exchange;
+        $this->routing_key = $routing_key;
     }
 
     /**
@@ -35,10 +44,10 @@ class RabbitMqConfig
      *
      * @return void
      */
-    public function Connection()
+    public function Connection(): void
     {
-        $AMQPStreamConnection = new AMQPStreamConnection($this->_host, $this->_port, $this->_user, $this->_password, $this->_vhost);
-        $this->_AMQPChannel = $AMQPStreamConnection->channel();
+        $amqpStreamConnection = new AMQPStreamConnection($this->host, $this->port, $this->user, $this->password, $this->vhost);
+        $this->amqpChannel = $amqpStreamConnection->channel();
     }
 
     /**
@@ -48,7 +57,7 @@ class RabbitMqConfig
      */
     public function CreateQueue(): void
     {
-        $this->_AMQPChannel->queue_declare($this->_queueName, false, false, false, false);
+        $this->amqpChannel->queue_declare($this->queueName, false, false, false, false);
     }
 
     /**
@@ -60,7 +69,7 @@ class RabbitMqConfig
      */
     public function CreateExchange(string $type): void
     {
-        $this->_AMQPChannel->exchange_declare($this->_exchange, $type, false, false, false);
+        $this->amqpChannel->exchange_declare($this->exchange, $type, false, false, false);
     }
 
     /**
@@ -71,9 +80,9 @@ class RabbitMqConfig
      * @param string $exchange
      * @return void
      */
-    public function BindExchangeToQueue(string $queue,string $exchange): void
+    public function BindExchangeToQueue(string $queue, string $exchange): void
     {
-        $this->_AMQPChannel->queue_bind($queue, $exchange, $this->_routing_key);
+        $this->amqpChannel->queue_bind($queue, $exchange, $this->routing_key);
     }
 
     /**
@@ -83,7 +92,7 @@ class RabbitMqConfig
      */
     public function GetRoutingKey(): string
     {
-        return $this->_routing_key;
+        return $this->routing_key;
     }
 
     /**
@@ -93,7 +102,7 @@ class RabbitMqConfig
      */
     public function GetQueueName(): string
     {
-        return $this->_queueName;
+        return $this->queueName;
     }
 
     /**
@@ -103,17 +112,17 @@ class RabbitMqConfig
      */
     public function GetExchange(): string
     {
-        return $this->_exchange;
+        return $this->exchange;
     }
 
     /**
-     * Get the avaible exchange.
+     * Get the avaible channel.
      *
      * @return AMQPChannel
      */
     public function GetChannel(): AMQPChannel
     {
-        return $this->_AMQPChannel;
+        return $this->amqpChannel;
     }
 
     /**
@@ -121,8 +130,8 @@ class RabbitMqConfig
      *
      * @return AMQPChannel
      */
-    public function CloseChannel() :AMQPChannel
+    public function CloseChannel(): AMQPChannel
     {
-        return $this->_AMQPChannel->close();
+        return $this->amqpChannel->close();
     }
 }

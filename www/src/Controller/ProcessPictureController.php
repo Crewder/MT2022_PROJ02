@@ -3,18 +3,58 @@
 
 namespace App\Controller;
 
+use App\Tools\Commons;
+use Exception;
 
 class ProcessPictureController
 {
-    public function __construct()
+    private string $folder;
+    private RabbitMQHandler $rabbitMQHandler;
+
+    public function __construct(RabbitMqConfig $config)
     {
+        $this->rabbitMQHandler = new RabbitMQHandler($config);
+        $this->folder = 'upload/';
     }
 
-    public static function processPicture($picture)
+    /**
+     * Upload picture in the folder define in constructor
+     *
+     * @return void
+     */
+    public function uploadPicture(): void
     {
-        $FOLDER = 'upload/';
-        $size = getimagesize($FOLDER . $picture['name']);
-        $pictureName = explode(".",$picture['name']);
+        if (isset($_FILES['picture'])) {
+            if (!file_exists($this->folder)) {
+                mkdir($this->folder);
+            }
+            $fileName = basename($_FILES['picture']['name']);
+            if (move_uploaded_file($_FILES['picture']['tmp_name'], $this->folder . $fileName)) {
+                echo 'Upload effectué avec succès !';
+
+                $path = $this->folder . $fileName;
+                $this->rabbitMQHandler->SendMessage($path);
+
+            } else {
+                echo 'Echec de l\'upload !';
+            }
+        }
+    }
+
+    /**
+     * Resize a picture
+     *
+     * @param string $path
+     * @return void
+     * @throws Exception
+     */
+    public function processPicture(string $path): void
+    {
+        $picture = Commons::GetImageByPath($path);
+
+
+        $size = getimagesize($this->folder . $picture['name']);
+        $pictureName = explode(".", $picture['name']);
         $width = $size[0];
         $heigth = $size[1];
         $newWidth = 128;
@@ -40,14 +80,16 @@ class ProcessPictureController
                 throw new Exception('Unknown image type.');
         }
 
-        $image = $image_create_func($FOLDER . $picture['name']);
-        $img_resized = imagecreatetruecolor ($newWidth, $newHeigth);
-        imagecopyresampled ($img_resized,$image,0,0,0,0,$newWidth,$newHeigth,$size[0],$size[1]);
+        $image = $image_create_func($this->folder . $picture['name']);
+        $img_resized = imagecreatetruecolor($newWidth, $newHeigth);
+        imagecopyresampled($img_resized, $image, 0, 0, 0, 0, $newWidth, $newHeigth, $size[0], $size[1]);
 
-        $newPictureFilename = $FOLDER.$pictureName[0].'_resized.'.$type;
-        if(!$image_save_func($img_resized,$newPictureFilename)){
+        $newPictureFilename = $this->folder . $pictureName[0] . '_resized.' . $type;
+        if (!$image_save_func($img_resized, $newPictureFilename)) {
             throw new Exception('L\'image n\'as pas pue être redimensioné');
         }
-        unlink($FOLDER . $picture['name']);
+        unlink($this->folder . $picture['name']);
     }
+
+
 }
