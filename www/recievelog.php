@@ -19,7 +19,7 @@ $exchange = "direct_resize";
 $routingkey = "Resize_route";
 
 // Connection au server et creation des elements necessaire a  l'utilisation des queues
- $config = new RabbitMqConfig(
+$config = new RabbitMqConfig(
     $host,
     $port,
     $user,
@@ -41,7 +41,6 @@ $Exchange = $config->GetExchange();
 $config->BindExchangeToQueue($Queue, $Exchange);
 
 
-
 echo " [*] Waiting for logs. To exit press CTRL+C\n";
 
 $callback = function ($msg) use ($config) {
@@ -50,7 +49,15 @@ $callback = function ($msg) use ($config) {
 };
 
 
-$config->GetChannel()->basic_consume("Image-Resizer", 'avatar', false, true, false, false, $callback);
+$config->GetChannel()->basic_consume(
+    "Image-Resizer",
+    'avatar',
+    false,
+    true,
+    false,
+    false,
+    $callback
+);
 
 while ($config->GetChannel()->is_open()) {
     $config->GetChannel()->wait();

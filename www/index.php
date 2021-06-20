@@ -29,15 +29,15 @@ $routingkey = "Resize_route";
 
 // Connection au server et creation des elements necessaire a  l'utilisation des queues
 $config = new RabbitMqConfig(
-                            $host,
-                            $port,
-                            $user,
-                            $password,
-                            $queuename,
-                            $vhost,
-                            $exchange,
-                            $routingkey
-                           );
+    $host,
+    $port,
+    $user,
+    $password,
+    $queuename,
+    $vhost,
+    $exchange,
+    $routingkey
+);
 
 $config->Connection();
 $config->CreateQueue();
@@ -51,17 +51,19 @@ $Exchange = $config->GetExchange();
 $config->BindExchangeToQueue($Queue, $Exchange);
 
 //handler pour la gestion des message  / Listen / Send
-//$handler = new RabbitMQHandler($config);
-//$handler->ListenQueue($Queue);
+$handler = new RabbitMQHandler($config);
+$handler->ListenQueue($Queue);
 
-
-// todo unactive timer
 // Fermeture de la connection
 //$config->CloseChannel();
 
 if ($_FILES['picture']) {
-  $controller = new ProcessPictureController($config);
-  $controller->uploadPicture();
+    $controller = new ProcessPictureController($config);
+    try {
+        $controller->uploadPicture();
+    } catch (Exception $e) {
+        echo $e;
+    }
     ?>
 
     <a type="button" href="/"> Retour </a>

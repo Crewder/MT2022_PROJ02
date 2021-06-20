@@ -3,7 +3,6 @@
 
 namespace App\Controller;
 
-use App\Tools\Commons;
 use Exception;
 
 class ProcessPictureController
@@ -21,6 +20,7 @@ class ProcessPictureController
      * Upload picture in the folder define in constructor
      *
      * @return void
+     * @throws Exception
      */
     public function uploadPicture(): void
     {
@@ -36,7 +36,7 @@ class ProcessPictureController
                 $this->rabbitMQHandler->SendMessage($path);
 
             } else {
-                echo 'Echec de l\'upload !';
+                throw new Exception( 'Echec de l\'upload !');
             }
         }
     }
@@ -50,45 +50,61 @@ class ProcessPictureController
      */
     public function processPicture(string $path): void
     {
-        $picture = Commons::GetImageByPath($path);
+        if (file_exists($path)) {
 
+            $pictureNameTmp = explode("/", $path);
+            $pictureName = explode(".", $pictureNameTmp[1]);
+            $pictureinfo = getimagesize($path);
 
-        $size = getimagesize($this->folder . $picture['name']);
-        $pictureName = explode(".", $picture['name']);
-        $width = $size[0];
-        $heigth = $size[1];
-        $newWidth = 128;
-        $newHeigth = 128;
+             var_dump($pictureinfo);
+            $newWidth = 128;
+            $newHeigth = 128;
 
-        switch ($picture['type']) {
-            case 'image/jpeg':
-                $image_create_func = 'imagecreatefromjpeg';
-                $image_save_func = 'imagejpeg';
-                $type = "jpg";
-                break;
-            case 'image/png':
-                $image_create_func = 'imagecreatefrompng';
-                $image_save_func = 'imagepng';
-                $type = "png";
-                break;
-            case 'image/gif':
-                $image_create_func = 'imagecreatefromgif';
-                $image_save_func = 'imagegif';
-                $type = "gif";
-                break;
-            default:
-                throw new Exception('Unknown image type.');
+            switch ($pictureinfo['mime']) {
+                case 'image/jpeg':
+                    $image_create_func = 'imagecreatefromjpeg';
+                    $image_save_func = 'imagejpeg';
+                    $type = "jpg";
+                    break;
+                case 'image/png':
+                    $image_create_func = 'imagecreatefrompng';
+                    $image_save_func = 'imagepng';
+                    $type = "png";
+                    break;
+                case 'image/gif':
+                    $image_create_func = 'imagecreatefromgif';
+                    $image_save_func = 'imagegif';
+                    $type = "gif";
+                    break;
+                default:
+                    throw new Exception('Unknown image type.');
+            }
+
+            $image = $image_create_func($path);
+            $img_resized = imagecreatetruecolor($newWidth, $newHeigth);
+
+            imagecopyresampled(
+                $img_resized,
+                $image,
+                0,
+                0,
+                0,
+                0,
+                $newWidth,
+                $newHeigth,
+                $pictureinfo[1],
+                $pictureinfo[2]
+            );
+
+            $newPictureFilename = $this->folder . $pictureName[0] . '_resized.' . $type;
+
+            if (!$image_save_func($img_resized, $newPictureFilename)) {
+                throw new Exception('L\'image n\'as pas pue être redimensioné');
+            }
+            unlink($path);
+        } else {
+            throw new Exception('L\'image n\'existe pas sur le serveur');
         }
-
-        $image = $image_create_func($this->folder . $picture['name']);
-        $img_resized = imagecreatetruecolor($newWidth, $newHeigth);
-        imagecopyresampled($img_resized, $image, 0, 0, 0, 0, $newWidth, $newHeigth, $size[0], $size[1]);
-
-        $newPictureFilename = $this->folder . $pictureName[0] . '_resized.' . $type;
-        if (!$image_save_func($img_resized, $newPictureFilename)) {
-            throw new Exception('L\'image n\'as pas pue être redimensioné');
-        }
-        unlink($this->folder . $picture['name']);
     }
 
 

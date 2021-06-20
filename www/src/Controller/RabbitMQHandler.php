@@ -53,7 +53,13 @@ class RabbitMQHandler
         };
 
         $this->amqpChannel->basic_qos(null, 1, null);
-        $this->amqpChannel->basic_consume($queueName, 'avatar', false, true, false, $callback);
+        $this->amqpChannel->basic_consume(
+            $queueName,
+            'avatar',
+            false,
+            true,
+            false,
+            $callback
+        );
     }
-
 }

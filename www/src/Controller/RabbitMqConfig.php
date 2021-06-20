@@ -19,15 +19,15 @@ class RabbitMqConfig
 
 
     public function __construct(
-                                string $host,
-                                int $port,
-                                string $user,
-                                string $password,
-                                string $queueName,
-                                string $vhost,
-                                string $exchange,
-                                string $routing_key
-                               )
+        string $host,
+        int $port,
+        string $user,
+        string $password,
+        string $queueName,
+        string $vhost,
+        string $exchange,
+        string $routing_key
+    )
     {
         $this->host = $host;
         $this->port = $port;
@@ -46,7 +46,13 @@ class RabbitMqConfig
      */
     public function Connection(): void
     {
-        $amqpStreamConnection = new AMQPStreamConnection($this->host, $this->port, $this->user, $this->password, $this->vhost);
+        $amqpStreamConnection = new AMQPStreamConnection(
+            $this->host,
+            $this->port,
+            $this->user,
+            $this->password,
+            $this->vhost
+        );
         $this->amqpChannel = $amqpStreamConnection->channel();
     }
 
@@ -57,7 +63,13 @@ class RabbitMqConfig
      */
     public function CreateQueue(): void
     {
-        $this->amqpChannel->queue_declare($this->queueName, false, false, false, false);
+        $this->amqpChannel->queue_declare(
+            $this->queueName,
+            false,
+            false,
+            false,
+            false
+        );
     }
 
     /**
@@ -69,7 +81,13 @@ class RabbitMqConfig
      */
     public function CreateExchange(string $type): void
     {
-        $this->amqpChannel->exchange_declare($this->exchange, $type, false, false, false);
+        $this->amqpChannel->exchange_declare(
+            $this->exchange,
+            $type,
+            false,
+            false,
+            false
+        );
     }
 
     /**
