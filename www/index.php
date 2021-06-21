@@ -15,6 +15,11 @@ require_once 'vendor/autoload.php';
 use App\Controller\ProcessPictureController;
 use App\Controller\RabbitMqConfig;
 use App\Controller\RabbitMQHandler;
+use App\Model\User\UserModel;
+
+$user = new UserModel();
+$user->setAvatar(2, 2);
+
 
 $host = "rabbitmq";
 $port = 5672;
