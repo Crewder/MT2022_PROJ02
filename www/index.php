@@ -15,6 +15,11 @@ require_once 'vendor/autoload.php';
 use App\Controller\ProcessPictureController;
 use App\Controller\RabbitMqConfig;
 use App\Controller\RabbitMQHandler;
+use App\Model\User\UserModel;
+
+$user = new UserModel();
+$user->setAvatar(2, 2);
+
 
 $host = "rabbitmq";
 $port = 5672;
@@ -49,13 +54,6 @@ $Exchange = $config->GetExchange();
 
 //relie l'exchange a la queue
 $config->BindExchangeToQueue($Queue, $Exchange);
-
-//handler pour la gestion des message  / Listen / Send
-$handler = new RabbitMQHandler($config);
-$handler->ListenQueue($Queue);
-
-// Fermeture de la connection
-//$config->CloseChannel();
 
 if ($_FILES['picture']) {
     $controller = new ProcessPictureController($config);

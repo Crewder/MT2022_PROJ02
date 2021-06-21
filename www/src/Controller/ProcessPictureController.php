@@ -55,8 +55,6 @@ class ProcessPictureController
             $pictureNameTmp = explode("/", $path);
             $pictureName = explode(".", $pictureNameTmp[1]);
             $pictureinfo = getimagesize($path);
-
-             var_dump($pictureinfo);
             $newWidth = 128;
             $newHeigth = 128;
 
@@ -106,6 +104,4 @@ class ProcessPictureController
             throw new Exception('L\'image n\'existe pas sur le serveur');
         }
     }
-
-
 }
