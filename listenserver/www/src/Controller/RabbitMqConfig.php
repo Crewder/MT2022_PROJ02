@@ -16,6 +16,7 @@ class RabbitMqConfig
     private AMQPChannel $amqpChannel;
     private string $exchange;
     private string $routing_key;
+    public string $webserverhost;
 
 
     public function __construct(
@@ -25,6 +26,7 @@ class RabbitMqConfig
         string $password,
         string $queueName,
         string $vhost,
+        string $webserverhost,
         string $exchange,
         string $routing_key
     )
@@ -37,6 +39,7 @@ class RabbitMqConfig
         $this->vhost = $vhost;
         $this->exchange = $exchange;
         $this->routing_key = $routing_key;
+        $this->webserverhost = $webserverhost;
     }
 
     /**

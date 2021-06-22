@@ -16,91 +16,76 @@ class ProcessPictureController
     }
 
     /**
-     * Upload picture in the folder define in constructor
-     *
-     * @return void
-     * @throws Exception
-     */
-    public function uploadPicture(): void
-    {
-        if (isset($_FILES['picture'])) {
-            if (!file_exists($this->folder)) {
-                mkdir($this->folder);
-            }
-            $fileName = basename($_FILES['picture']['name']);
-            if (move_uploaded_file($_FILES['picture']['tmp_name'], $this->folder . $fileName)) {
-                echo 'Upload effectué avec succès !';
-
-                $path = $this->folder . $fileName;
-                $this->rabbitMQHandler->SendMessage($path);
-
-            } else {
-                throw new Exception( 'Echec de l\'upload !');
-            }
-        }
-    }
-
-    /**
      * Resize a picture
      *
      * @param string $path
      * @return void
      * @throws Exception
      */
-    public function processPicture(string $path): void
+    public function processPicture(string $path, string $webserverhost): void
     {
-        if (file_exists($path)) {
+        $path = $webserverhost . "/" . $path;
 
-            $pictureNameTmp = explode("/", $path);
-            $pictureName = explode(".", $pictureNameTmp[1]);
-            $pictureinfo = getimagesize($path);
-            $newWidth = 128;
-            $newHeigth = 128;
+        $pictureNameTmp = explode("/", $path);
+        $pictureName = explode(".", $pictureNameTmp[2]);
 
-            switch ($pictureinfo['mime']) {
-                case 'image/jpeg':
-                    $image_create_func = 'imagecreatefromjpeg';
-                    $image_save_func = 'imagejpeg';
-                    $type = "jpg";
-                    break;
-                case 'image/png':
-                    $image_create_func = 'imagecreatefrompng';
-                    $image_save_func = 'imagepng';
-                    $type = "png";
-                    break;
-                case 'image/gif':
-                    $image_create_func = 'imagecreatefromgif';
-                    $image_save_func = 'imagegif';
-                    $type = "gif";
-                    break;
-                default:
-                    throw new Exception('Unknown image type.');
-            }
+        $ch = curl_init($path);
+        $fp = fopen('upload/'. $pictureNameTmp[2], 'a+');
+        curl_setopt($ch, CURLOPT_FILE, $fp);
+        curl_exec($ch);
+        curl_close($ch);
+        fclose($fp);
 
-            $image = $image_create_func($path);
-            $img_resized = imagecreatetruecolor($newWidth, $newHeigth);
+        $localPath = "upload/" . $pictureNameTmp[2];
 
-            imagecopyresampled(
-                $img_resized,
-                $image,
-                0,
-                0,
-                0,
-                0,
-                $newWidth,
-                $newHeigth,
-                $pictureinfo[1],
-                $pictureinfo[2]
-            );
+        $pictureinfo = getimagesize($localPath);
 
-            $newPictureFilename = $this->folder . $pictureName[0] . '_resized.' . $type;
+        $newWidth = 128;
+        $newHeigth = 128;
 
-            if (!$image_save_func($img_resized, $newPictureFilename)) {
-                throw new Exception('L\'image n\'as pas pue être redimensioné');
-            }
-            unlink($path);
-        } else {
-            throw new Exception('L\'image n\'existe pas sur le serveur');
+        switch ($pictureinfo['mime']) {
+            case 'image/jpeg':
+                $image_create_func = 'imagecreatefromjpeg';
+                $image_save_func = 'imagejpeg';
+                $type = "jpg";
+                break;
+            case 'image/png':
+                $image_create_func = 'imagecreatefrompng';
+                $image_save_func = 'imagepng';
+                $type = "png";
+                break;
+            case 'image/gif':
+                $image_create_func = 'imagecreatefromgif';
+                $image_save_func = 'imagegif';
+                $type = "gif";
+                break;
+            default:
+                throw new Exception('Unknown image type.');
         }
+
+        $image = $image_create_func($localPath);
+        $img_resized = imagecreatetruecolor($newWidth, $newHeigth);
+
+        imagecopyresampled(
+            $img_resized,
+            $image,
+            0,
+            0,
+            0,
+            0,
+            $newWidth,
+            $newHeigth,
+            $pictureinfo[0],
+            $pictureinfo[1]
+        );
+
+        $newPictureFilename = $this->folder . $pictureName[0] . '_resized.' . $type;
+
+        if (!$image_save_func($img_resized, $newPictureFilename)) {
+            throw new Exception('L\'image n\'as pas pue être redimensioné');
+        } else {
+            echo "l'image a été redimensionné";
+        }
+        unlink($localPath);
     }
 }
