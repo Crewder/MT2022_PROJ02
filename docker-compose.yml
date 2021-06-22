@@ -19,7 +19,7 @@ services:
       context: ./docker/apache/listenserver
     container_name: 'listenserver'
     ports:
-      - "8090:90"
+      - "8090:80"
     user: ${UID}
     links:
       - mysql
@@ -32,9 +32,8 @@ services:
       context: ./docker/apache/fileserver
     container_name: 'fileserver'
     ports:
-      - "8070:70"
+      - "8070:80"
     links:
-      - rabbitmq
     user: ${UID}
     volumes:
       - ./fileserver/www:/var/www/html
