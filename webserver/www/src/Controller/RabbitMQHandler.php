@@ -50,6 +50,7 @@ class RabbitMQHandler
         $callback = function ($msg) {
             $controller = new ProcessPictureController($this->config);
             $controller->processPicture($msg->body);
+            $this->config->CloseChannel();
         };
 
         $this->amqpChannel->basic_qos(null, 1, null);
