@@ -41,7 +41,7 @@ sudo composer dump-autoload
 sudo docker exec -ti listenserver /bin/bash  
 sudo composer install  
 sudo composer dump-autoload   
-php recievelog.php > logs.log
+php reciever.php > logs.log
 
 
 ## 3 - Tester le projet
