@@ -37,7 +37,8 @@ class ProcessPictureController
                 $this->rabbitMQHandler->SendMessage($path);
 
                 $setavatar = new AvatarModel();
-                $setavatar->insert($path);
+                $tmpPath = explode('.', $path);
+                $setavatar->insert($tmpPath[0] . "_resized." . $tmpPath[1]);
             } else {
                 throw new Exception('Echec de l\'upload !');
             }

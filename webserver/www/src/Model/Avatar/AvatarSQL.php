@@ -18,6 +18,8 @@ class AvatarSQL
             UPDATE avatar SET picture = :value WHERE id = :id
         ";
     }
+
+
     public static function insert()
     {
         return "

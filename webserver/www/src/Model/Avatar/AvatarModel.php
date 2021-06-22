@@ -27,6 +27,15 @@ class AvatarModel extends AbstractModel
         return $this->execute($sql, $variables);
     }
 
+    public function insert(string $value)
+    {
+        $sql = AvatarSQL::insert();
+        $variables = [
+            'picture' => $value
+        ];
+        return $this->execute($sql, $variables);
+    }
+
     public function getPicture($id)
     {
         $avatar = $this->findById($id);
@@ -39,11 +48,4 @@ class AvatarModel extends AbstractModel
         $this->updateById($id, $value);
     }
 
-    public function insert(string $value)
-    {
-        $sql = AvatarSQL::insert();
-        $variables = [
-            'value' => $value
-        ];
-    }
 }

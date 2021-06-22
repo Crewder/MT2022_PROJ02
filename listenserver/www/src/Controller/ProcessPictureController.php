@@ -29,22 +29,16 @@ class ProcessPictureController
         $pictureNameTmp = explode("/", $path);
         $pictureName = explode(".", $pictureNameTmp[2]);
 
-
         $ch = curl_init($path);
-        $fp = fopen('src/upload/'. $pictureNameTmp[2], 'a+');
+        $fp = fopen('upload/'. $pictureNameTmp[2], 'a+');
         curl_setopt($ch, CURLOPT_FILE, $fp);
         curl_exec($ch);
         curl_close($ch);
         fclose($fp);
 
-
-
-//  a remplacer par basename
-
-        $localPath = "src/upload/" . $pictureNameTmp[2];
+        $localPath = "upload/" . $pictureNameTmp[2];
 
         $pictureinfo = getimagesize($localPath);
-
 
         $newWidth = 128;
         $newHeigth = 128;
@@ -85,7 +79,7 @@ class ProcessPictureController
             $pictureinfo[1]
         );
 
-        $newPictureFilename = "src/" .$this->folder . $pictureName[0] . '_resized.' . $type;
+        $newPictureFilename = $this->folder . $pictureName[0] . '_resized.' . $type;
 
         if (!$image_save_func($img_resized, $newPictureFilename)) {
             throw new Exception('L\'image n\'as pas pue être redimensioné');
