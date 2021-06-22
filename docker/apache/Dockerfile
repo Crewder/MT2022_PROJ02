@@ -17,12 +17,17 @@ RUN touch /var/log/cron.log
 CMD cron && tail -f /var/log/cron.log
 
 # Install important libraries
-RUN apt-get -y install --fix-missing apt-utils build-essential git curl libcurl4 libcurl3-dev zip openssl libpng-dev libjpeg-dev
+RUN apt-get -y install --fix-missing apt-utils build-essential git curl libcurl4 libcurl3-dev zip openssl libpng-dev libjpeg-dev libsodium-dev
 
 RUN docker-php-ext-install pdo pdo_mysql
 
 RUN docker-php-ext-configure gd --with-jpeg
 RUN docker-php-ext-install -j$(nproc) gd
+
+RUN docker-php-ext-configure sodium
+RUN docker-php-ext-install sodium
+
+RUN docker-php-ext-install sockets
 
 # Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
