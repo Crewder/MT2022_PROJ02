@@ -27,25 +27,13 @@ services:
     volumes:
       - ./listenserver/www:/var/www/html
       - ./config/envvars:/etc/apache2/envvars
-  fileserver:
-    build:
-      context: ./docker/apache/fileserver
-    container_name: 'fileserver'
-    ports:
-      - "8070:80"
-    links:
-      - rabbitmq
-    user: ${UID}
-    volumes:
-      - ./fileserver/www:/var/www/html
-      - ./config/envvars:/etc/apache2/envvars
   mysql:
     build: ./docker/mysql
     container_name: 'mysql'
     ports:
       - "1998:3306"
     volumes:
-      - ./data/mysql:/var/lib/mysql
+      - ./data/config:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
   phpmyadmin:

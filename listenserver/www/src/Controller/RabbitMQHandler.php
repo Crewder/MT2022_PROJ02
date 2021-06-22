@@ -44,13 +44,13 @@ class RabbitMQHandler
      *
      * @param $queueName
      * @return void
+     * @throws \ErrorException
      */
     public function ListenQueue($queueName): void
     {
-        $callback = function ($msg) {
+        $callback = function ($msg){
             $controller = new ProcessPictureController($this->config);
             $controller->processPicture($msg->body);
-            $this->config->CloseChannel();
         };
 
         $this->amqpChannel->basic_qos(null, 1, null);
@@ -62,5 +62,9 @@ class RabbitMQHandler
             false,
             $callback
         );
+
+        while ($this->config->GetChannel()->is_open()) {
+            $this->config->GetChannel()->wait();
+        }
     }
 }

@@ -2,6 +2,8 @@
 
 namespace App\Controller;
 
+use App\Model\Avatar\AvatarModel;
+use CURLFile;
 use Exception;
 
 class ProcessPictureController
@@ -34,74 +36,11 @@ class ProcessPictureController
                 $path = $this->folder . $fileName;
                 $this->rabbitMQHandler->SendMessage($path);
 
+                $setavatar = new AvatarModel();
+                $setavatar->insert($path);
             } else {
                 throw new Exception('Echec de l\'upload !');
             }
-        }
-    }
-
-    /**
-     * Resize a picture
-     *
-     * @param string $path
-     * @return void
-     * @throws Exception
-     */
-    public function processPicture(string $path): void
-    {
-        if (file_exists($path)) {
-            $pictureNameTmp = explode("/", $path);
-            $pictureName = explode(".", $pictureNameTmp[1]);
-            $pictureinfo = getimagesize($path);
-            $newWidth = 128;
-            $newHeigth = 128;
-
-            switch ($pictureinfo['mime']) {
-                case 'image/jpeg':
-                    $image_create_func = 'imagecreatefromjpeg';
-                    $image_save_func = 'imagejpeg';
-                    $type = "jpg";
-                    break;
-                case 'image/png':
-                    $image_create_func = 'imagecreatefrompng';
-                    $image_save_func = 'imagepng';
-                    $type = "png";
-                    break;
-                case 'image/gif':
-                    $image_create_func = 'imagecreatefromgif';
-                    $image_save_func = 'imagegif';
-                    $type = "gif";
-                    break;
-                default:
-                    throw new Exception('Unknown image type.');
-            }
-
-            $image = $image_create_func($path);
-            $img_resized = imagecreatetruecolor($newWidth, $newHeigth);
-
-            imagecopyresampled(
-                $img_resized,
-                $image,
-                0,
-                0,
-                0,
-                0,
-                $newWidth,
-                $newHeigth,
-                $pictureinfo[0],
-                $pictureinfo[1]
-            );
-
-            $newPictureFilename = $this->folder . $pictureName[0] . '_resized.' . $type;
-
-            if (!$image_save_func($img_resized, $newPictureFilename)) {
-                throw new Exception('L\'image n\'as pas pue être redimensioné');
-            } else {
-                echo "l'image a été redimensionné";
-            }
-            unlink($path);
-        } else {
-            throw new Exception('L\'image n\'existe pas sur le serveur');
         }
     }
 }

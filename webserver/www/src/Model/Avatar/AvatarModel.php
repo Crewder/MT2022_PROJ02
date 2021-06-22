@@ -38,4 +38,12 @@ class AvatarModel extends AbstractModel
     {
         $this->updateById($id, $value);
     }
+
+    public function insert(string $value)
+    {
+        $sql = AvatarSQL::insert();
+        $variables = [
+            'value' => $value
+        ];
+    }
 }
