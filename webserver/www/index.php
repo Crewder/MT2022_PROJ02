@@ -9,13 +9,12 @@
 </head>
 <body>
 <?php
-
 require_once 'vendor/autoload.php';
 
 use App\Controller\ProcessPictureController;
 use App\Controller\RabbitMqConfig;
-use App\Controller\RabbitMQHandler;
 
+$fileserverhost = "fileserver";
 $host = "rabbitmq";
 $port = 5672;
 $user = "guest";
@@ -35,6 +34,7 @@ $config = new RabbitMqConfig(
     $password,
     $queuename,
     $vhost,
+    $fileserverhost,
     $exchange,
     $routingkey
 );

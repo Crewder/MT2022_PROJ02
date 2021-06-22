@@ -3,7 +3,7 @@ version: "3.7"
 services:
   webserver:
     build:
-      context: ./docker/apache
+      context: ./docker/apache/webserver
     container_name: 'webserver'
     ports:
       - "8080:80"
@@ -12,7 +12,20 @@ services:
       - mysql
       - rabbitmq
     volumes:
-      - ./www:/var/www/html
+      - ./webserver/www:/var/www/html
+      - ./config/envvars:/etc/apache2/envvars
+  listenserver:
+    build:
+      context: ./docker/apache/listenserver
+    container_name: 'listenserver'
+    ports:
+      - "8090:80"
+    user: ${UID}
+    links:
+      - mysql
+      - rabbitmq
+    volumes:
+      - ./listenserver/www:/var/www/html
       - ./config/envvars:/etc/apache2/envvars
   mysql:
     build: ./docker/mysql
@@ -20,7 +33,7 @@ services:
     ports:
       - "1998:3306"
     volumes:
-      - ./data/mysql:/var/lib/mysql
+      - ./data/config:/var/lib/mysql
     environment:
       MYSQL_ROOT_PASSWORD: root
   phpmyadmin:

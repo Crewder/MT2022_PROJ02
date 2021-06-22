@@ -8,7 +8,6 @@
   * [1. Installation](#installation)
   * [2. Configuration webserver](#configuration-webserver)
   * [3. Configuration listenserver](#configuration-listenserver)
-   * [4. Logs / Listen](#logs-listen)
 * [3. Tester le projet](#tester-projet)
 * [4. Screens](#screens)
 
@@ -41,12 +40,9 @@ sudo composer dump-autoload
 
 sudo docker exec -ti listenserver /bin/bash  
 sudo composer install  
-sudo composer dump-autoload
+sudo composer dump-autoload   
+php reciever.php > logs.log
 
-###### 4 - Logs / Listen
-<a name="logs-listen"/>
-
-php recievelog.php > logs.log
 
 ## 3 - Tester le projet
 <a name="tester-projet"/>

@@ -6,14 +6,18 @@ use App\Controller\ProcessPictureController;
 use App\Controller\RabbitMqConfig;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 
-
 $host = "rabbitmq";
 $port = 5672;
 $user = "guest";
 $password = "guest";
 $vhost = "rabbitmq-host";
 
-//confiiguration des queues
+
+
+
+$webserverhost = "webserver";
+
+//configuration des queues
 $queuename = "Image-Resizer";
 $exchange = "direct_resize";
 $routingkey = "Resize_route";
@@ -26,6 +30,7 @@ $config = new RabbitMqConfig(
     $password,
     $queuename,
     $vhost,
+    $webserverhost,
     $exchange,
     $routingkey
 );
@@ -41,13 +46,13 @@ $Exchange = $config->GetExchange();
 $config->BindExchangeToQueue($Queue, $Exchange);
 
 
+
 echo " [*] Waiting for logs. To exit press CTRL+C\n";
 
 $callback = function ($msg) use ($config) {
     $controller = new ProcessPictureController($config);
-    $controller->processPicture($msg->body);
+    $controller->processPicture($msg->body,$config->webserverhost);
 };
-
 
 $config->GetChannel()->basic_consume(
     "Image-Resizer",
