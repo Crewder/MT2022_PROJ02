@@ -13,6 +13,7 @@ class RabbitMqConfig
     private string $password;
     private string $queueName;
     private string $vhost;
+    public string $fileserverhost;
     private AMQPChannel $amqpChannel;
     private string $exchange;
     private string $routing_key;
@@ -25,6 +26,7 @@ class RabbitMqConfig
         string $password,
         string $queueName,
         string $vhost,
+        string $fileserverhost,
         string $exchange,
         string $routing_key
     )
@@ -35,6 +37,7 @@ class RabbitMqConfig
         $this->password = $password;
         $this->queueName = $queueName;
         $this->vhost = $vhost;
+        $this->fileserverhost = $fileserverhost;
         $this->exchange = $exchange;
         $this->routing_key = $routing_key;
     }
