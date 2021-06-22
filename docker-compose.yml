@@ -34,6 +34,7 @@ services:
     ports:
       - "8070:80"
     links:
+      - rabbitmq
     user: ${UID}
     volumes:
       - ./fileserver/www:/var/www/html
