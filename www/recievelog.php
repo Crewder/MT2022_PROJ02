@@ -1,20 +1,11 @@
-<!doctype html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
-</head>
-<body>
 <?php
 
-require_once 'vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
 
 use App\Controller\ProcessPictureController;
 use App\Controller\RabbitMqConfig;
-use App\Controller\RabbitMQHandler;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
+
 
 $host = "rabbitmq";
 $port = 5672;
@@ -22,7 +13,7 @@ $user = "guest";
 $password = "guest";
 $vhost = "rabbitmq-host";
 
-//configuration des queues
+//confiiguration des queues
 $queuename = "Image-Resizer";
 $exchange = "direct_resize";
 $routingkey = "Resize_route";
@@ -38,7 +29,6 @@ $config = new RabbitMqConfig(
     $exchange,
     $routingkey
 );
-
 $config->Connection();
 $config->CreateQueue();
 $config->CreateExchange("direct");
@@ -50,25 +40,26 @@ $Exchange = $config->GetExchange();
 //relie l'exchange a la queue
 $config->BindExchangeToQueue($Queue, $Exchange);
 
-if ($_FILES['picture']) {
+
+echo " [*] Waiting for logs. To exit press CTRL+C\n";
+
+$callback = function ($msg) use ($config) {
     $controller = new ProcessPictureController($config);
-    try {
-        $controller->uploadPicture();
-    } catch (Exception $e) {
-        echo $e;
-    }
-    ?>
+    $controller->processPicture($msg->body);
+};
 
-    <a type="button" href="/"> Retour </a>
-    <?php
-}else {
-?>
-<form action="index.php" method="POST" enctype="multipart/form-data">
-    <input type="file" name="picture" id="picture">
-    <input type="submit" value="Enregistrer image">
-</form>
-</body>
-</html>
 
-<?php
+$config->GetChannel()->basic_consume(
+    "Image-Resizer",
+    'avatar',
+    false,
+    true,
+    false,
+    false,
+    $callback
+);
+
+while ($config->GetChannel()->is_open()) {
+    $config->GetChannel()->wait();
 }
+
