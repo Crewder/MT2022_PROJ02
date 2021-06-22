@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use AMQPChannel;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 

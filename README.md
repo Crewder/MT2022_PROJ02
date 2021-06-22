@@ -1,15 +1,33 @@
 # MT2022 PROJ02
+*Camille Arsac, Rémi Coufourier, Florian Leroy et Steven Nativel*
 
-# Installation 
-docker-compose build  
-docker-compose up -d  
+### Table de contenu
 
-#Configuration webserver
+* [1. Description](#description)
+* [2. Installation](#installation)
+* [3. Configuration webserver](#configuration-webserver)
+* [4. Logs / Listen](#logs-listen)
+
+
+## 1 - Description du projet
+<a name="description"/>
+Une petite application permettant de redimensionner une image et mettant en relation rabbitMQ.
+
+## 2 - Installation du projet
+<a name="installation"/>
+
+sudo docker-compose build  
+sudo docker-compose up -d  
+
+## 3 - Configuration du webserver
+<a name="configuration-webserver"/>
 
 sudo docker exec -ti webserver /bin/bash  
-composer install  
-composer dump-autoload  
+sudo composer install  
+sudo composer dump-autoload
 
-# logs / listen 
+
+## 4 - Logs / Listen
+<a name="logs-listen"/>
 
 php recievelog.php > logs.log
