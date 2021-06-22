@@ -49,3 +49,4 @@ RUN a2enmod rewrite headers
 RUN a2enmod ssl
 
 CMD ( cron -f & ) && apachectl -D FOREGROUND
+
