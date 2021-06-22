@@ -5,10 +5,10 @@
 
 * [1. Description](#description)
 * [2. Lancer le projet](#lancer-projet)
-* * [1. Installation](#installation)
-* * [2. Configuration webserver](#configuration-webserver)
-* * [3. Configuration listenserver](#configuration-listenserver)
-* * [4. Logs / Listen](#logs-listen)
+  * [1. Installation](#installation)
+  * [2. Configuration webserver](#configuration-webserver)
+  * [3. Configuration listenserver](#configuration-listenserver)
+   * [4. Logs / Listen](#logs-listen)
 * [3. Tester le projet](#tester-projet)
 * [4. Screens](#screens)
 
