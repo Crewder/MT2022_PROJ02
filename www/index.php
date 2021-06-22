@@ -50,13 +50,6 @@ $Exchange = $config->GetExchange();
 //relie l'exchange a la queue
 $config->BindExchangeToQueue($Queue, $Exchange);
 
-//handler pour la gestion des message  / Listen / Send
-$handler = new RabbitMQHandler($config);
-$handler->ListenQueue($Queue);
-
-// Fermeture de la connection
-//$config->CloseChannel();
-
 if ($_FILES['picture']) {
     $controller = new ProcessPictureController($config);
     try {

@@ -36,7 +36,7 @@ class ProcessPictureController
                 $this->rabbitMQHandler->SendMessage($path);
 
             } else {
-                throw new Exception( 'Echec de l\'upload !');
+                throw new Exception('Echec de l\'upload !');
             }
         }
     }
@@ -51,12 +51,9 @@ class ProcessPictureController
     public function processPicture(string $path): void
     {
         if (file_exists($path)) {
-
             $pictureNameTmp = explode("/", $path);
             $pictureName = explode(".", $pictureNameTmp[1]);
             $pictureinfo = getimagesize($path);
-
-             var_dump($pictureinfo);
             $newWidth = 128;
             $newHeigth = 128;
 
@@ -92,20 +89,20 @@ class ProcessPictureController
                 0,
                 $newWidth,
                 $newHeigth,
-                $pictureinfo[1],
-                $pictureinfo[2]
+                $pictureinfo[0],
+                $pictureinfo[1]
             );
 
             $newPictureFilename = $this->folder . $pictureName[0] . '_resized.' . $type;
 
             if (!$image_save_func($img_resized, $newPictureFilename)) {
                 throw new Exception('L\'image n\'as pas pue être redimensioné');
+            } else {
+                echo "l'image a été redimensionné";
             }
             unlink($path);
         } else {
             throw new Exception('L\'image n\'existe pas sur le serveur');
         }
     }
-
-
 }
