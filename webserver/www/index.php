@@ -9,12 +9,10 @@
 </head>
 <body>
 <?php
-require_once('vendor/autoload.php');
+require_once 'vendor/autoload.php';
 
 use App\Controller\ProcessPictureController;
 use App\Controller\RabbitMqConfig;
-
-
 
 
 $host = "rabbitmq";
